@@ -19,11 +19,12 @@ namespace osu.Game.Rulesets.Chop.Input
         public ChopPlayfield Playfield = null!;
 
         private const double update_interval = 1000 / 120.0;
-        private const float slice_velocity_threshold = 15f;
+        private const float slice_velocity_threshold = 10f;
 
         private Vector2 sliceStartPosition;
         private Vector2 currentPosition;
         private bool sliceActive;
+        private double lastSliceTime;
 
         public new ChopInputState CurrentState => (ChopInputState)base.CurrentState;
 
@@ -77,6 +78,8 @@ namespace osu.Game.Rulesets.Chop.Input
                     }
 
                     PropagateEvent(new SliceEvent(CurrentState, lastPosition, sliceStartPosition));
+
+                    lastSliceTime = Time.Current;
                 }
                 else if (sliceActive)
                 {

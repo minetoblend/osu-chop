@@ -84,6 +84,7 @@ public partial class ChopCursorContainer : GameplayCursorContainer, ISliceEventH
         if (currentPath == null)
             return false;
 
+        currentPath.AddVertex(e.MousePosition);
         currentPath.OnStrokeEnded();
         currentPath = null;
 

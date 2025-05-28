@@ -22,7 +22,7 @@ public partial class ChopCursorPath : TexturedStroke
     public ChopCursorPath()
     {
         AutoSizeAxes = Axes.Both;
-        PathRadius = 20;
+        PathRadius = 15;
     }
 
     public void AddVertex(Vector2 position)
@@ -31,6 +31,8 @@ public partial class ChopCursorPath : TexturedStroke
         insertionTimes.Add(Time.Current);
 
         Vertices = vertices;
+
+        OriginPosition = PositionInBoundingBox(Vertices[^1]);
     }
 
     public void UpdateCursorPosition(Vector2 position)
@@ -74,7 +76,7 @@ public partial class ChopCursorPath : TexturedStroke
         if (changed)
             Vertices = vertices;
 
-        if (active && Vertices.Count > 0)
+        if (Vertices.Count > 0)
             OriginPosition = PositionInBoundingBox(Vertices[^1]);
     }
 
