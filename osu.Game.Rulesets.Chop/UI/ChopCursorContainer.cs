@@ -45,6 +45,13 @@ public partial class ChopCursorContainer : GameplayCursorContainer, ISliceEventH
         }
     };
 
+    protected override void LoadComplete()
+    {
+        base.LoadComplete();
+
+        ActiveCursor.ApplyGameWideClock(host);
+    }
+
     public bool OnSlice(SliceEvent e)
     {
         if (Precision.AlmostEquals(e.MousePosition, e.LastMousePosition))
@@ -57,7 +64,7 @@ public partial class ChopCursorContainer : GameplayCursorContainer, ISliceEventH
 
     public bool OnSliceStarted(SliceStartEvent e)
     {
-        ActiveCursor.Hide();
+        ActiveCursor.FadeOut(30);
 
         Add(currentPath = new ChopCursorPath
         {
@@ -78,7 +85,7 @@ public partial class ChopCursorContainer : GameplayCursorContainer, ISliceEventH
         if (currentPath == null)
             return false;
 
-        ActiveCursor.Show();
+        ActiveCursor.FadeIn(30);
 
         currentPath.AddVertex(e.MousePosition);
         currentPath.OnStrokeEnded();

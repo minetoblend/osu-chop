@@ -79,7 +79,7 @@ namespace osu.Game.Rulesets.Chop.Input
 
                 lastSliceTime = Time.Current;
             }
-            else if (sliceActive && Time.Current > lastSliceTime + 20)
+            else if (sliceActive && Time.Current > lastSliceTime + 40)
             {
                 sliceActive = false;
                 PropagateEvent(new SliceEndEvent(CurrentState, lastPosition, sliceStartPosition));
