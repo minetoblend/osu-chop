@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using osu.Game.Beatmaps;
 using osu.Game.Rulesets.Chop.Objects;
@@ -19,9 +20,7 @@ namespace osu.Game.Rulesets.Chop.Beatmaps
         {
         }
 
-        // todo: Check for conversion types that should be supported (ie. Beatmap.HitObjects.Any(h => h is IHasXPosition))
-        // https://github.com/ppy/osu/tree/master/osu.Game/Rulesets/Objects/Types
-        public override bool CanConvert() => true;
+        public override bool CanConvert() => Beatmap.HitObjects.All(h => h is IHasPosition && h is IHasCombo);
 
         protected override IEnumerable<ChopHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap, CancellationToken cancellationToken)
         {
@@ -29,8 +28,9 @@ namespace osu.Game.Rulesets.Chop.Beatmaps
             {
                 Samples = original.Samples,
                 StartTime = original.StartTime,
-                Position = (original as IHasPosition)?.Position ?? Vector2.Zero,
+                Position = ((original as IHasPosition)?.Position ?? Vector2.Zero) * new Vector2(1, 0.5f),
                 ThrowOffset = (Random.Shared.NextSingle() - 0.5f) * 200,
+                NewCombo = (original as IHasCombo)?.NewCombo ?? false,
             };
         }
     }

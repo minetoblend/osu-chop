@@ -13,7 +13,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Chop.Objects
 {
-    public class ChopHitObject : HitObject, IHasPosition
+    public class ChopHitObject : HitObject, IHasPosition, IHasComboInformation
     {
         /// <summary>
         /// The radius of hit objects (i.e. the radius of a <see cref="ChopNote"/>).
@@ -80,5 +80,67 @@ namespace osu.Game.Rulesets.Chop.Objects
         }
 
         protected override HitWindows CreateHitWindows() => new ChopHitWindows();
+
+        #region IHasComboInformation
+
+        public Bindable<int> IndexInCurrentComboBindable { get; } = new Bindable<int>();
+
+        public int IndexInCurrentCombo
+        {
+            get => IndexInCurrentComboBindable.Value;
+            set => IndexInCurrentComboBindable.Value = value;
+        }
+
+        public Bindable<int> ComboIndexBindable { get; } = new Bindable<int>();
+
+        public int ComboIndex
+        {
+            get => ComboIndexBindable.Value;
+            set => ComboIndexBindable.Value = value;
+        }
+
+        public Bindable<int> ComboIndexWithOffsetsBindable { get; } = new Bindable<int>();
+
+        public int ComboIndexWithOffsets
+        {
+            get => ComboIndexWithOffsetsBindable.Value;
+            set => ComboIndexWithOffsetsBindable.Value = value;
+        }
+
+        public int ComboOffset { get; set; }
+
+        public Bindable<bool> LastInComboBindable { get; } = new Bindable<bool>();
+
+        public bool LastInCombo { get; set; }
+
+        public bool NewCombo { get; set; }
+
+        public void UpdateComboInformation(IHasComboInformation? lastObj)
+        {
+            // Note that this implementation is shared with the osu!catch ruleset's implementation.
+            // If a change is made here, CatchHitObject.cs should also be updated.
+            int index = lastObj?.ComboIndex ?? 0;
+            int indexWithOffsets = lastObj?.ComboIndexWithOffsets ?? 0;
+            int inCurrentCombo = (lastObj?.IndexInCurrentCombo + 1) ?? 0;
+
+            // - For the purpose of combo colours, spinners never start a new combo even if they are flagged as doing so.
+            // - At decode time, the first hitobject in the beatmap and the first hitobject after a spinner are both enforced to be a new combo,
+            //   but this isn't directly enforced by the editor so the extra checks against the last hitobject are duplicated here.
+            if (NewCombo || lastObj == null)
+            {
+                inCurrentCombo = 0;
+                index++;
+                indexWithOffsets += ComboOffset + 1;
+
+                if (lastObj != null)
+                    lastObj.LastInCombo = true;
+            }
+
+            ComboIndex = index;
+            ComboIndexWithOffsets = indexWithOffsets;
+            IndexInCurrentCombo = inCurrentCombo;
+        }
+
+        #endregion
     }
 }
