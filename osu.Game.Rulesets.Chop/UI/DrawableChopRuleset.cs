@@ -13,6 +13,7 @@ using osu.Game.Rulesets.Chop.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
+using osuTK;
 
 namespace osu.Game.Rulesets.Chop.UI
 {
@@ -31,5 +32,7 @@ namespace osu.Game.Rulesets.Chop.UI
         public override DrawableHitObject<ChopHitObject> CreateDrawableRepresentation(ChopHitObject h) => new DrawableChopHitObject(h);
 
         protected override PassThroughInputManager CreateInputManager() => new ChopInputManager(Ruleset?.RulesetInfo);
+
+        public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
     }
 }

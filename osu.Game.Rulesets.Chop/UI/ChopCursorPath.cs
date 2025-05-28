@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Utils;
 using osu.Game.Rulesets.Chop.Graphics;
@@ -15,6 +16,8 @@ public partial class ChopCursorPath : TexturedStroke
     private readonly List<double> insertionTimes = new List<double>();
 
     private bool active = true;
+
+    public Color4 AccentColour { get; set; } = Color4.Gray;
 
     public ChopCursorPath()
     {
@@ -83,7 +86,7 @@ public partial class ChopCursorPath : TexturedStroke
         if (position < 0.3f)
             return Color4.White;
 
-        return Interpolation.ValueAt(position, Color4.Gray, Color4.White, 0.3f, 1.5f);
+        return Interpolation.ValueAt(position, AccentColour, AccentColour.Lighten(2), 0.3f, 1.5f);
     }
 
     protected override float ThicknessAt(float progress)

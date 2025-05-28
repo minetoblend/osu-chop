@@ -4,12 +4,15 @@
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Game.Rulesets.UI;
+using osuTK;
 
 namespace osu.Game.Rulesets.Chop.UI
 {
     [Cached]
     public partial class ChopPlayfield : Playfield
     {
+        public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
+
         [BackgroundDependencyLoader]
         private void load()
         {
@@ -18,5 +21,7 @@ namespace osu.Game.Rulesets.Chop.UI
                 HitObjectContainer,
             });
         }
+
+        protected override GameplayCursorContainer CreateCursor() => new ChopCursorContainer();
     }
 }

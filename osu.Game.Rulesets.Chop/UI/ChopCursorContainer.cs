@@ -1,22 +1,51 @@
-﻿using osu.Framework.Graphics;
-using osu.Framework.Graphics.Cursor;
+﻿using System;
+using osu.Framework.Allocation;
+using osu.Framework.Extensions.Color4Extensions;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Platform;
 using osu.Framework.Utils;
+using osu.Game.Extensions;
+using osu.Game.Rulesets.UI;
 using osuTK;
+using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Chop.UI;
 
-public partial class ChopCursorContainer : CursorContainer
+public partial class ChopCursorContainer : GameplayCursorContainer
 {
     private Vector2 position;
     private CursorState state;
     private Vector2 sliceStartPosition;
 
-    protected override Drawable CreateCursor() => new Circle
+    [Resolved]
+    private GameHost host { get; set; } = null!;
+
+    public event Action? SliceStarted;
+
+    public event Action? SliceEnded;
+
+    protected override Drawable CreateCursor() => new CircularContainer
     {
         Size = new Vector2(20),
         Origin = Anchor.Centre,
+        Masking = true,
+        BorderColour = Color4.White,
+        BorderThickness = 3,
+        EdgeEffect = new EdgeEffectParameters
+        {
+            Radius = 150,
+            Colour = Color4.GreenYellow.Opacity(0.1f),
+            Type = EdgeEffectType.Glow
+        },
+        Child = new Box
+        {
+            RelativeSizeAxes = Axes.Both,
+            Colour = Color4.GreenYellow,
+        }
     };
 
     protected override void LoadComplete()
@@ -58,10 +87,15 @@ public partial class ChopCursorContainer : CursorContainer
                 {
                     sliceStartPosition = state.Position;
 
+                    SliceStarted?.Invoke();
+
                     Add(currentPath = new ChopCursorPath
                     {
-                        Depth = 1
+                        AccentColour = Color4.GreenYellow,
+                        Depth = 1,
                     });
+
+                    currentPath.ApplyGameWideClock(host);
                 }
 
                 currentPath.AddVertex(state.Position);
@@ -70,6 +104,8 @@ public partial class ChopCursorContainer : CursorContainer
             {
                 currentPath.OnStrokeEnded();
                 currentPath = null;
+
+                SliceEnded?.Invoke();
             }
         }
 
