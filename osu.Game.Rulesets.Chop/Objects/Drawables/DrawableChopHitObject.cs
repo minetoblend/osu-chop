@@ -39,13 +39,15 @@ namespace osu.Game.Rulesets.Chop.Objects.Drawables
 
         protected float ThrowProgressAt(double time)
         {
-            return (float)((time - HitObject.StartTime - HitObject.TimePreempt) / (HitObject.TimePreempt * 2));
+            double throwDuration = HitObject.TimePreempt * 2;
+
+            return (float)((time - (HitObject.StartTime - HitObject.TimePreempt)) / throwDuration);
         }
 
         protected Vector2 ThrowPositionAt(float progress)
         {
             float xOffset = ThrowOffsetBindable.Value * (progress - 0.5f) * 2;
-            float yOffset = ChopPlayfield.BASE_SIZE.Y * (progress - 0.5f) * (progress - 0.5f) * 4;
+            float yOffset = ChopPlayfield.BASE_SIZE.Y * ((progress - 0.5f) * (progress - 0.5f) * 4);
 
             return HitObject.Position + new Vector2(xOffset, yOffset);
         }

@@ -33,6 +33,8 @@ namespace osu.Game.Rulesets.Chop.UI
 
         protected override PassThroughInputManager CreateInputManager() => new ChopInputManager(Ruleset?.RulesetInfo);
 
+        public override PlayfieldAdjustmentContainer CreatePlayfieldAdjustmentContainer() => new ChopPlayfieldAdjustmentContainer();
+
         public override bool ReceivePositionalInputAt(Vector2 screenSpacePos) => true;
     }
 }

@@ -2,9 +2,10 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Allocation;
-using osu.Framework.Graphics;
+using osu.Game.Rulesets.Chop.Input;
 using osu.Game.Rulesets.Chop.Objects;
 using osu.Game.Rulesets.Chop.Objects.Drawables;
+using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.UI;
 using osuTK;
 
@@ -15,17 +16,33 @@ namespace osu.Game.Rulesets.Chop.UI
     {
         public static readonly Vector2 BASE_SIZE = new Vector2(512, 384);
 
+        [Resolved]
+        private ChopInputManager inputManager { get; set; } = null!;
+
         [BackgroundDependencyLoader]
         private void load()
         {
-            AddRangeInternal(new Drawable[]
-            {
-                HitObjectContainer,
-            });
+            inputManager.Playfield = this;
+
+            AddRangeInternal([
+                HitObjectContainer
+            ]);
 
             RegisterPool<ChopNote, DrawableChopNote>(20, 100);
         }
 
         protected override GameplayCursorContainer CreateCursor() => new ChopCursorContainer();
+
+        protected override HitObjectLifetimeEntry CreateLifetimeEntry(HitObject hitObject) => new ChopLifetimeEntry(hitObject);
+
+        private class ChopLifetimeEntry : HitObjectLifetimeEntry
+        {
+            public ChopLifetimeEntry(HitObject hitObject)
+                : base(hitObject)
+            {
+            }
+
+            protected override double InitialLifetimeOffset => ((ChopHitObject)HitObject).TimePreempt;
+        }
     }
 }

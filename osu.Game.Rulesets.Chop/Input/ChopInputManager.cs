@@ -1,18 +1,23 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.StateChanges.Events;
 using osu.Framework.Input.States;
 using osu.Framework.Utils;
+using osu.Game.Rulesets.Chop.UI;
 using osu.Game.Rulesets.UI;
 using osuTK;
 
 namespace osu.Game.Rulesets.Chop.Input
 {
+    [Cached]
     public partial class ChopInputManager : RulesetInputManager<ChopAction>
     {
+        public ChopPlayfield Playfield = null!;
+
         private const double update_interval = 1000 / 120.0;
         private const float slice_velocity_threshold = 15f;
 
@@ -33,14 +38,14 @@ namespace osu.Game.Rulesets.Chop.Input
         {
             base.HandleMousePositionChange(e);
 
-            currentPosition = ToLocalSpace(CurrentState.Mouse.Position);
+            currentPosition = CurrentState.Mouse.Position;
         }
 
         protected override void LoadComplete()
         {
             base.LoadComplete();
 
-            CurrentState.Slice.Position = ToLocalSpace(CurrentState.Mouse.Position);
+            CurrentState.Slice.Position = CurrentState.Mouse.Position;
             CurrentState.Slice.LastUpdate = Time.Current;
         }
 
@@ -58,7 +63,7 @@ namespace osu.Game.Rulesets.Chop.Input
 
                 state.LastUpdate += update_interval;
 
-                var delta = state.Position - lastPosition;
+                var delta = Playfield.ToLocalSpace(state.Position) - Playfield.ToLocalSpace(lastPosition);
 
                 float velocity = delta.Length;
 
@@ -83,28 +88,30 @@ namespace osu.Game.Rulesets.Chop.Input
 
         protected Drawable? PropagateEvent(ChopEvent e)
         {
-            foreach (var d in NonPositionalInputQueue)
+            foreach (var drawable in NonPositionalInputQueue)
             {
-                if (d is not ISliceEventHandler handler)
+                if (drawable is not ISliceEventHandler handler)
                     continue;
+
+                e.Target = drawable;
 
                 switch (e)
                 {
                     case SliceEvent sliceEvent:
                         if (handler.OnSlice(sliceEvent))
-                            return d;
+                            return drawable;
 
                         break;
 
                     case SliceStartEvent sliceStartEvent:
                         if (handler.OnSliceStarted(sliceStartEvent))
-                            return d;
+                            return drawable;
 
                         break;
 
                     case SliceEndEvent sliceEndEvent:
                         if (handler.OnSliceEnded(sliceEndEvent))
-                            return d;
+                            return drawable;
 
                         break;
                 }

@@ -7,16 +7,20 @@ public class ChopEvent : UIEvent
 {
     public new ChopInputState CurrentState => (ChopInputState)base.CurrentState;
 
-    public new Vector2 MousePosition => CurrentState.Slice.Position;
+    public new Vector2 MousePosition => Target!.ToLocalSpace(CurrentState.Slice.Position);
 
-    public readonly Vector2 LastMousePosition;
+    public readonly Vector2 ScreenSpaceLastMousePosition;
 
-    public readonly Vector2 SliceStartPosition;
+    public readonly Vector2 ScreenSpaceSliceStartPosition;
+
+    public Vector2 LastMousePosition => Target!.ToLocalSpace(ScreenSpaceLastMousePosition);
+
+    public Vector2 SliceStartPosition => Target!.ToLocalSpace(ScreenSpaceSliceStartPosition);
 
     public ChopEvent(ChopInputState state, Vector2 lastPosition, Vector2 sliceStartPosition)
         : base(state)
     {
-        LastMousePosition = lastPosition;
-        SliceStartPosition = sliceStartPosition;
+        ScreenSpaceLastMousePosition = lastPosition;
+        ScreenSpaceSliceStartPosition = sliceStartPosition;
     }
 }
