@@ -1,5 +1,4 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -7,27 +6,26 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
+using osu.Framework.Logging;
 using osu.Framework.Platform;
-using osu.Framework.Utils;
 using osu.Game.Extensions;
+using osu.Game.Rulesets.Chop.Input;
 using osu.Game.Rulesets.UI;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Chop.UI;
 
-public partial class ChopCursorContainer : GameplayCursorContainer
+public partial class ChopCursorContainer : GameplayCursorContainer, ISliceEventHandler
 {
     private Vector2 position;
-    private CursorState state;
-    private Vector2 sliceStartPosition;
+
+    private ChopCursorPath? currentPath;
 
     [Resolved]
     private GameHost host { get; set; } = null!;
 
-    public event Action? SliceStarted;
-
-    public event Action? SliceEnded;
+    public override bool HandleNonPositionalInput => true;
 
     protected override Drawable CreateCursor() => new CircularContainer
     {
@@ -49,15 +47,6 @@ public partial class ChopCursorContainer : GameplayCursorContainer
         }
     };
 
-    protected override void LoadComplete()
-    {
-        base.LoadComplete();
-
-        var inputManager = GetContainingInputManager()!;
-
-        state = new CursorState(ToLocalSpace(inputManager.CurrentState.Mouse.Position), Vector2.Zero, Time.Current);
-    }
-
     protected override bool OnMouseMove(MouseMoveEvent e)
     {
         position = e.MousePosition;
@@ -69,38 +58,19 @@ public partial class ChopCursorContainer : GameplayCursorContainer
     {
         base.Update();
 
-        updateCursorPath();
-    }
-
-    private ChopCursorPath? currentPath;
-
-    private void updateCursorPath()
-    {
-        while (state.Interpolate(position, Time.Current, out var newState))
-        {
-            state = newState;
-
-            const float threshold = 15f;
-
-            if (state.Velocity > threshold)
-            {
-                if (currentPath == null)
-                    beginSlice();
-
-                currentPath?.AddVertex(state.Position);
-            }
-            else if (currentPath != null)
-                endSlice();
-        }
-
         currentPath?.UpdateCursorPosition(position);
     }
 
-    private void beginSlice()
+    public bool OnSlice(SliceEvent e)
     {
-        sliceStartPosition = state.Position;
+        currentPath?.AddVertex(e.MousePosition);
 
-        SliceStarted?.Invoke();
+        return false;
+    }
+
+    public bool OnSliceStarted(SliceStartEvent e)
+    {
+        Logger.Log("Slice started");
 
         Add(currentPath = new ChopCursorPath
         {
@@ -109,38 +79,19 @@ public partial class ChopCursorContainer : GameplayCursorContainer
         });
 
         currentPath.ApplyGameWideClock(host);
+
+        return false;
     }
 
-    private void endSlice()
+    public bool OnSliceEnded(SliceEndEvent e)
     {
+        Logger.Log("Slice ended");
+
         Debug.Assert(currentPath != null);
 
         currentPath.OnStrokeEnded();
         currentPath = null;
 
-        SliceEnded?.Invoke();
-    }
-
-    private readonly record struct CursorState(Vector2 Position, Vector2 Delta, double Time)
-    {
-        private const float cursor_framerate = 120;
-
-        public bool Interpolate(Vector2 newPosition, double currentTime, out CursorState newState)
-        {
-            const double interval = 1000 / cursor_framerate;
-
-            if (Time + interval > currentTime)
-            {
-                newState = default;
-                return false;
-            }
-
-            var position = Interpolation.ValueAt(Time + interval, Position, newPosition, Time, currentTime);
-
-            newState = new CursorState(position, position - Position, Time + interval);
-            return true;
-        }
-
-        public float Velocity => Delta.Length;
+        return false;
     }
 }

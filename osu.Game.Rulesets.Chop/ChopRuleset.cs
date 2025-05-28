@@ -48,11 +48,7 @@ namespace osu.Game.Rulesets.Chop
 
         public override string ShortName => "chopruleset";
 
-        public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => new[]
-        {
-            new KeyBinding(InputKey.Z, ChopAction.Button1),
-            new KeyBinding(InputKey.X, ChopAction.Button2),
-        };
+        public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => [];
 
         public override Drawable CreateIcon() => new Icon(ShortName[0]);
 

@@ -7,8 +7,8 @@ using osu.Framework.Input;
 using osu.Game.Beatmaps;
 using osu.Game.Input.Handlers;
 using osu.Game.Replays;
+using osu.Game.Rulesets.Chop.Input;
 using osu.Game.Rulesets.Chop.Objects;
-using osu.Game.Rulesets.Chop.Objects.Drawables;
 using osu.Game.Rulesets.Chop.Replays;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.Objects.Drawables;
@@ -20,7 +20,7 @@ namespace osu.Game.Rulesets.Chop.UI
     [Cached]
     public partial class DrawableChopRuleset : DrawableRuleset<ChopHitObject>
     {
-        public DrawableChopRuleset(ChopRuleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod> mods = null)
+        public DrawableChopRuleset(ChopRuleset ruleset, IBeatmap beatmap, IReadOnlyList<Mod>? mods = null)
             : base(ruleset, beatmap, mods)
         {
         }
@@ -29,7 +29,7 @@ namespace osu.Game.Rulesets.Chop.UI
 
         protected override ReplayInputHandler CreateReplayInputHandler(Replay replay) => new ChopFramedReplayInputHandler(replay);
 
-        public override DrawableHitObject<ChopHitObject> CreateDrawableRepresentation(ChopHitObject h) => new DrawableChopHitObject(h);
+        public override DrawableHitObject<ChopHitObject>? CreateDrawableRepresentation(ChopHitObject h) => null;
 
         protected override PassThroughInputManager CreateInputManager() => new ChopInputManager(Ruleset?.RulesetInfo);
 

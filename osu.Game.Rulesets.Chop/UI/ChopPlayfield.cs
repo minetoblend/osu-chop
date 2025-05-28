@@ -3,6 +3,8 @@
 
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Chop.Objects;
+using osu.Game.Rulesets.Chop.Objects.Drawables;
 using osu.Game.Rulesets.UI;
 using osuTK;
 
@@ -20,6 +22,8 @@ namespace osu.Game.Rulesets.Chop.UI
             {
                 HitObjectContainer,
             });
+
+            RegisterPool<ChopNote, DrawableChopNote>(20, 100);
         }
 
         protected override GameplayCursorContainer CreateCursor() => new ChopCursorContainer();

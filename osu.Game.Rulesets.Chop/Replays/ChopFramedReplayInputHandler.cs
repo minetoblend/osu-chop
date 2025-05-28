@@ -6,6 +6,7 @@ using System.Linq;
 using osu.Framework.Input.StateChanges;
 using osu.Framework.Utils;
 using osu.Game.Replays;
+using osu.Game.Rulesets.Chop.Input;
 using osu.Game.Rulesets.Replays;
 
 namespace osu.Game.Rulesets.Chop.Replays
