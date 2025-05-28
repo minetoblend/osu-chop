@@ -1,12 +1,10 @@
-﻿using System.Diagnostics;
-using osu.Framework.Allocation;
+﻿using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Game.Extensions;
 using osu.Game.Rulesets.Chop.Input;
@@ -70,8 +68,6 @@ public partial class ChopCursorContainer : GameplayCursorContainer, ISliceEventH
 
     public bool OnSliceStarted(SliceStartEvent e)
     {
-        Logger.Log("Slice started");
-
         Add(currentPath = new ChopCursorPath
         {
             AccentColour = Color4.GreenYellow,
@@ -85,9 +81,8 @@ public partial class ChopCursorContainer : GameplayCursorContainer, ISliceEventH
 
     public bool OnSliceEnded(SliceEndEvent e)
     {
-        Logger.Log("Slice ended");
-
-        Debug.Assert(currentPath != null);
+        if (currentPath == null)
+            return false;
 
         currentPath.OnStrokeEnded();
         currentPath = null;
