@@ -16,6 +16,16 @@ namespace osu.Game.Rulesets.Chop.Objects
     public class ChopHitObject : HitObject, IHasPosition
     {
         /// <summary>
+        /// The radius of hit objects (i.e. the radius of a <see cref="ChopNote"/>).
+        /// </summary>
+        public const float OBJECT_RADIUS = 32;
+
+        /// <summary>
+        /// The width and height any element participating in display of a chop note (or similarly sized object) should be.
+        /// </summary>
+        public static readonly Vector2 OBJECT_DIMENSIONS = new Vector2(OBJECT_RADIUS * 2);
+
+        /// <summary>
         /// Minimum preempt time at AR=10.
         /// </summary>
         public const double PREEMPT_MIN = 450;

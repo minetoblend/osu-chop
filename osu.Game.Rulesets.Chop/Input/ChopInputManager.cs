@@ -6,7 +6,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.StateChanges.Events;
 using osu.Framework.Input.States;
-using osu.Framework.Utils;
 using osu.Game.Rulesets.Chop.UI;
 using osu.Game.Rulesets.UI;
 using osuTK;
@@ -18,8 +17,7 @@ namespace osu.Game.Rulesets.Chop.Input
     {
         public ChopPlayfield Playfield = null!;
 
-        private const double update_interval = 1000 / 120.0;
-        private const float slice_velocity_threshold = 10f;
+        private const double update_interval = 1000 / 200.0;
 
         private Vector2 sliceStartPosition;
         private Vector2 currentPosition;
@@ -54,38 +52,37 @@ namespace osu.Game.Rulesets.Chop.Input
         {
             base.Update();
 
+            const float slice_velocity_threshold = 5f;
+
             var state = CurrentState.Slice;
 
-            while (state.LastUpdate + update_interval < Time.Current)
+            var lastPosition = state.Position;
+
+            state.Position = currentPosition;
+
+            state.LastUpdate += update_interval;
+
+            var delta = Playfield.ToLocalSpace(state.Position) - Playfield.ToLocalSpace(lastPosition);
+
+            float velocity = delta.Length / (float)Time.Elapsed;
+
+            if (velocity > slice_velocity_threshold)
             {
-                var lastPosition = state.Position;
-
-                state.Position = Interpolation.ValueAt(state.LastUpdate + update_interval, state.Position, currentPosition, state.LastUpdate, Time.Current);
-
-                state.LastUpdate += update_interval;
-
-                var delta = Playfield.ToLocalSpace(state.Position) - Playfield.ToLocalSpace(lastPosition);
-
-                float velocity = delta.Length;
-
-                if (velocity > slice_velocity_threshold)
+                if (!sliceActive)
                 {
-                    if (!sliceActive)
-                    {
-                        sliceActive = true;
-                        sliceStartPosition = currentPosition;
-                        PropagateEvent(new SliceStartEvent(CurrentState, lastPosition, sliceStartPosition));
-                    }
-
-                    PropagateEvent(new SliceEvent(CurrentState, lastPosition, sliceStartPosition));
-
-                    lastSliceTime = Time.Current;
+                    sliceActive = true;
+                    sliceStartPosition = currentPosition;
+                    PropagateEvent(new SliceStartEvent(CurrentState, lastPosition, sliceStartPosition));
                 }
-                else if (sliceActive)
-                {
-                    sliceActive = false;
-                    PropagateEvent(new SliceEndEvent(CurrentState, lastPosition, sliceStartPosition));
-                }
+
+                PropagateEvent(new SliceEvent(CurrentState, lastPosition, sliceStartPosition));
+
+                lastSliceTime = Time.Current;
+            }
+            else if (sliceActive && Time.Current > lastSliceTime + 20)
+            {
+                sliceActive = false;
+                PropagateEvent(new SliceEndEvent(CurrentState, lastPosition, sliceStartPosition));
             }
         }
 

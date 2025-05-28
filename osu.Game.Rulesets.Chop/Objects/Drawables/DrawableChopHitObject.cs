@@ -2,12 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
-using osu.Framework.Graphics;
 using osu.Game.Rulesets.Chop.UI;
 using osu.Game.Rulesets.Objects.Drawables;
-using osu.Game.Rulesets.Scoring;
 using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Chop.Objects.Drawables
 {
@@ -51,34 +48,12 @@ namespace osu.Game.Rulesets.Chop.Objects.Drawables
             float xOffset = ThrowOffsetBindable.Value * (progress - 0.5f) * 2;
             float yOffset = ChopPlayfield.BASE_SIZE.Y * ((progress - 0.5f) * (progress - 0.5f) * 4);
 
-            return HitObject.Position + new Vector2(xOffset, yOffset);
-        }
-
-        protected override void CheckForResult(bool userTriggered, double timeOffset)
-        {
-            if (timeOffset >= 0)
-                // todo: implement judgement logic
-                ApplyResult(HitResult.Perfect);
-        }
-
-        protected override void UpdateHitStateTransforms(ArmedState state)
-        {
-            const double duration = 1000;
-
-            switch (state)
-            {
-                case ArmedState.Hit:
-                    this.FadeOut(duration, Easing.OutQuint).Expire();
-                    break;
-
-                case ArmedState.Miss:
-                    this.FadeColour(Color4.Red, duration);
-                    this.FadeOut(duration, Easing.InQuint).Expire();
-                    break;
-            }
+            return new Vector2(xOffset, yOffset);
         }
 
         public void MissForcefully() => ApplyMinResult();
+
+        protected override double InitialLifetimeOffset => HitObject.TimePreempt;
     }
 
     public partial class DrawableChopHitObject<T> : DrawableChopHitObject

@@ -32,6 +32,7 @@ public partial class ChopCursorPath : TexturedStroke
 
         Vertices = vertices;
 
+        Position = position;
         OriginPosition = PositionInBoundingBox(Vertices[^1]);
     }
 

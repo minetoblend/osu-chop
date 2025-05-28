@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using osu.Game.Beatmaps;
@@ -29,6 +30,7 @@ namespace osu.Game.Rulesets.Chop.Beatmaps
                 Samples = original.Samples,
                 StartTime = original.StartTime,
                 Position = (original as IHasPosition)?.Position ?? Vector2.Zero,
+                ThrowOffset = (Random.Shared.NextSingle() - 0.5f) * 200,
             };
         }
     }

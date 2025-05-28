@@ -13,9 +13,11 @@ using osu.Game.Graphics;
 using osu.Game.Rulesets.Difficulty;
 using osu.Game.Rulesets.Chop.Beatmaps;
 using osu.Game.Rulesets.Chop.Mods;
+using osu.Game.Rulesets.Chop.Skinning;
 using osu.Game.Rulesets.Chop.UI;
 using osu.Game.Rulesets.Mods;
 using osu.Game.Rulesets.UI;
+using osu.Game.Skinning;
 using osuTK;
 using osuTK.Graphics;
 
@@ -73,6 +75,8 @@ namespace osu.Game.Rulesets.Chop
                 };
             }
         }
+
+        public override ISkin? CreateSkinTransformer(ISkin skin, IBeatmap beatmap) => new ChopSkinTransformer(skin);
 
         // Leave this line intact. It will bake the correct version into the ruleset on each build/release.
         public override string RulesetAPIVersionSupported => CURRENT_RULESET_API_VERSION;

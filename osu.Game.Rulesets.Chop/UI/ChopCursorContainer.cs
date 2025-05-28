@@ -4,8 +4,8 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
-using osu.Framework.Input.Events;
 using osu.Framework.Platform;
+using osu.Framework.Utils;
 using osu.Game.Extensions;
 using osu.Game.Rulesets.Chop.Input;
 using osu.Game.Rulesets.UI;
@@ -45,22 +45,11 @@ public partial class ChopCursorContainer : GameplayCursorContainer, ISliceEventH
         }
     };
 
-    protected override bool OnMouseMove(MouseMoveEvent e)
-    {
-        position = e.MousePosition;
-
-        return base.OnMouseMove(e);
-    }
-
-    protected override void Update()
-    {
-        base.Update();
-
-        currentPath?.UpdateCursorPosition(position);
-    }
-
     public bool OnSlice(SliceEvent e)
     {
+        if (Precision.AlmostEquals(e.MousePosition, e.LastMousePosition))
+            return false;
+
         currentPath?.AddVertex(e.MousePosition);
 
         return false;
@@ -68,13 +57,18 @@ public partial class ChopCursorContainer : GameplayCursorContainer, ISliceEventH
 
     public bool OnSliceStarted(SliceStartEvent e)
     {
+        ActiveCursor.Hide();
+
         Add(currentPath = new ChopCursorPath
         {
             AccentColour = Color4.GreenYellow,
             Depth = 1,
+            Vertices = [e.LastMousePosition]
         });
 
         currentPath.ApplyGameWideClock(host);
+
+        currentPath.AddVertex(e.MousePosition);
 
         return false;
     }
@@ -83,6 +77,8 @@ public partial class ChopCursorContainer : GameplayCursorContainer, ISliceEventH
     {
         if (currentPath == null)
             return false;
+
+        ActiveCursor.Show();
 
         currentPath.AddVertex(e.MousePosition);
         currentPath.OnStrokeEnded();
