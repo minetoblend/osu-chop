@@ -52,7 +52,7 @@ namespace osu.Game.Rulesets.Chop
 
         public override IEnumerable<KeyBinding> GetDefaultKeyBindings(int variant = 0) => [];
 
-        public override Drawable CreateIcon() => new Icon(ShortName[0]);
+        public override Drawable CreateIcon() => new ChopIcon(this);
 
         public partial class Icon : CompositeDrawable
         {
@@ -79,6 +79,8 @@ namespace osu.Game.Rulesets.Chop
         public override ISkin? CreateSkinTransformer(ISkin skin, IBeatmap beatmap) => new ChopSkinTransformer(skin);
 
         public override IBeatmapProcessor? CreateBeatmapProcessor(IBeatmap beatmap) => new BeatmapProcessor(beatmap);
+
+
 
         // Leave this line intact. It will bake the correct version into the ruleset on each build/release.
         public override string RulesetAPIVersionSupported => CURRENT_RULESET_API_VERSION;
