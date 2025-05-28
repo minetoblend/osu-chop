@@ -15,7 +15,7 @@ namespace osu.Game.Rulesets.Chop.Input
     [Cached]
     public partial class ChopInputManager : RulesetInputManager<ChopAction>
     {
-        public ChopPlayfield Playfield = null!;
+        public ChopPlayfield? Playfield;
 
         private const double update_interval = 1000 / 200.0;
 
@@ -40,6 +40,11 @@ namespace osu.Game.Rulesets.Chop.Input
             currentPosition = CurrentState.Mouse.Position;
         }
 
+        private Vector2 toPlayfieldSpace(Vector2 screenSpacePosition) =>
+            Playfield != null
+                ? Playfield.ToLocalSpace(screenSpacePosition)
+                : ToLocalSpace(screenSpacePosition);
+
         protected override void LoadComplete()
         {
             base.LoadComplete();
@@ -62,7 +67,7 @@ namespace osu.Game.Rulesets.Chop.Input
 
             state.LastUpdate += update_interval;
 
-            var delta = Playfield.ToLocalSpace(state.Position) - Playfield.ToLocalSpace(lastPosition);
+            var delta = toPlayfieldSpace(state.Position) - toPlayfieldSpace(lastPosition);
 
             float velocity = delta.Length / (float)Time.Elapsed;
 

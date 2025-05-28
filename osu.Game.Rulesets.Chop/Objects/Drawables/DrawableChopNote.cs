@@ -2,6 +2,7 @@
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Chop.Skinning.Default;
+using osu.Game.Rulesets.Chop.UI;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
@@ -104,8 +105,9 @@ public partial class DrawableChopNote : DrawableChopHitObject<ChopNote>
         }
 
         var result = ResultFor(timeOffset);
+        var action = HitPolicy.CheckHittable(this, Time.Current, result);
 
-        if (result == HitResult.Miss)
+        if (result == HitResult.Miss || action != ClickAction.Hit)
             return;
 
         if (result == HitResult.None)
@@ -124,7 +126,8 @@ public partial class DrawableChopNote : DrawableChopHitObject<ChopNote>
         base.UpdateInitialTransforms();
 
         approachCircle
-            .FadeInFromZero(HitObject.TimePreempt)
+            .FadeOut()
+            .FadeTo(0.5f, HitObject.TimePreempt)
             .ScaleTo(1, HitObject.TimePreempt);
     }
 
@@ -148,8 +151,15 @@ public partial class DrawableChopNote : DrawableChopHitObject<ChopNote>
 
             case ArmedState.Miss:
                 sliceContainer.Reset();
-                this.FadeColour(Color4.Red, duration);
+                this.FadeColour(Color4.Red, 500);
                 this.FadeOut(duration, Easing.InQuint).Expire();
+
+                approachCircle
+                    .MoveToY(50, 300, Easing.InQuad)
+                    .FadeColour(Color4.Red, 300)
+                    .ScaleTo(0.7f, 300, Easing.In)
+                    .FadeOut(300);
+
                 break;
         }
     }

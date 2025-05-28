@@ -70,7 +70,7 @@ namespace osu.Game.Rulesets.Chop.Objects
             set => ThrowOffsetBindable.Value = value;
         }
 
-        public double TimePreempt { get; private set; }
+        public double TimePreempt { get; set; }
 
         protected override void ApplyDefaultsToSelf(ControlPointInfo controlPointInfo, IBeatmapDifficultyInfo difficulty)
         {
