@@ -13,9 +13,10 @@ namespace osu.Game.Rulesets.Chop.Objects.Drawables;
 
 public partial class DrawableChopNote : DrawableChopHitObject<ChopNote>
 {
-    private BufferedContainer mainContent = null!;
+    private SliceableContainer sliceContainer = null!;
     private Container throwContainer = null!;
     private SkinnableDrawable approachCircle = null!;
+    private SliceReceptor sliceReceptor = null!;
 
     public DrawableChopNote(ChopNote hitObject)
         : base(hitObject)
@@ -40,29 +41,25 @@ public partial class DrawableChopNote : DrawableChopHitObject<ChopNote>
                 Origin = Anchor.Centre,
                 Scale = new Vector2(0),
             },
-            mainContent = new BufferedContainer(cachedFrameBuffer: true)
-            {
-                RelativeSizeAxes = Axes.Both,
-                Alpha = 0,
-                AlwaysPresent = true,
-                Children =
-                [
-                    new SkinnableDrawable(new ChopSkinComponentLookup(ChopSkinComponents.ChopNotePiece))
-                    {
-                        RelativeSizeAxes = Axes.Both,
-                    }
-                ],
-            },
             throwContainer = new Container
             {
                 RelativeSizeAxes = Axes.Both,
                 Children =
                 [
-                    mainContent.CreateView().With(d =>
+                    sliceContainer = new SliceableContainer
                     {
-                        d.RelativeSizeAxes = Axes.Both;
-                    }),
-                    new SliceReceptor
+                        RelativeSizeAxes = Axes.Both,
+                        Anchor = Anchor.Centre,
+                        Origin = Anchor.Centre,
+                        Children =
+                        [
+                            new SkinnableDrawable(new ChopSkinComponentLookup(ChopSkinComponents.ChopNotePiece))
+                            {
+                                RelativeSizeAxes = Axes.Both,
+                            }
+                        ]
+                    },
+                    sliceReceptor = new SliceReceptor
                     {
                         RelativeSizeAxes = Axes.Both,
                         CanHit = canHit,
@@ -114,6 +111,9 @@ public partial class DrawableChopNote : DrawableChopHitObject<ChopNote>
         if (result == HitResult.None)
             return;
 
+        if (!sliceContainer.Slice(sliceReceptor.LastSliceStartPosition, sliceReceptor.LastSliceEndPosition))
+            return;
+
         ApplyResult(result);
     }
 
@@ -134,6 +134,10 @@ public partial class DrawableChopNote : DrawableChopHitObject<ChopNote>
 
         switch (state)
         {
+            case ArmedState.Idle:
+                sliceContainer.Reset();
+                break;
+
             case ArmedState.Hit:
                 this.FadeOut(duration, Easing.OutQuint).Expire();
 
@@ -143,6 +147,7 @@ public partial class DrawableChopNote : DrawableChopHitObject<ChopNote>
                 break;
 
             case ArmedState.Miss:
+                sliceContainer.Reset();
                 this.FadeColour(Color4.Red, duration);
                 this.FadeOut(duration, Easing.InQuint).Expire();
                 break;

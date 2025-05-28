@@ -12,6 +12,9 @@ public partial class SliceReceptor : CompositeDrawable, ISliceEventHandler
 
     public required Action Hit { get; init; }
 
+    public Vector2 LastSliceStartPosition;
+    public Vector2 LastSliceEndPosition;
+
     public bool OnSlice(SliceEvent e)
     {
         var start = e.LastMousePosition;
@@ -24,6 +27,9 @@ public partial class SliceReceptor : CompositeDrawable, ISliceEventHandler
 
             if (!CanHit())
                 return false;
+
+            LastSliceStartPosition = e.ScreenSpaceLastMousePosition;
+            LastSliceEndPosition = e.ScreenSpaceMousePosition;
 
             Hit();
             return true;
