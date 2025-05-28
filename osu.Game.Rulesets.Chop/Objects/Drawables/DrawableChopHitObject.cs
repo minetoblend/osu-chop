@@ -16,6 +16,8 @@ namespace osu.Game.Rulesets.Chop.Objects.Drawables
         protected readonly Bindable<Vector2> PositionBindable = new Bindable<Vector2>();
         protected readonly Bindable<float> ThrowOffsetBindable = new Bindable<float>();
 
+        public HitPolicy HitPolicy { get; set; } = null!;
+
         public DrawableChopHitObject(ChopHitObject? hitObject)
             : base(hitObject!)
         {
@@ -75,6 +77,8 @@ namespace osu.Game.Rulesets.Chop.Objects.Drawables
                     break;
             }
         }
+
+        public void MissForcefully() => ApplyMinResult();
     }
 
     public partial class DrawableChopHitObject<T> : DrawableChopHitObject
