@@ -57,7 +57,7 @@ namespace osu.Game.Rulesets.Chop.Input
         {
             base.Update();
 
-            const float slice_velocity_threshold = 5f;
+            const float slice_velocity_threshold = 3f;
 
             var state = CurrentState.Slice;
 
