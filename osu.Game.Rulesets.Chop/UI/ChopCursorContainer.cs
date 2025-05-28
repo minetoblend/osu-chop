@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
@@ -84,32 +85,40 @@ public partial class ChopCursorContainer : GameplayCursorContainer
             if (state.Velocity > threshold)
             {
                 if (currentPath == null)
-                {
-                    sliceStartPosition = state.Position;
+                    beginSlice();
 
-                    SliceStarted?.Invoke();
-
-                    Add(currentPath = new ChopCursorPath
-                    {
-                        AccentColour = Color4.GreenYellow,
-                        Depth = 1,
-                    });
-
-                    currentPath.ApplyGameWideClock(host);
-                }
-
-                currentPath.AddVertex(state.Position);
+                currentPath?.AddVertex(state.Position);
             }
             else if (currentPath != null)
-            {
-                currentPath.OnStrokeEnded();
-                currentPath = null;
-
-                SliceEnded?.Invoke();
-            }
+                endSlice();
         }
 
         currentPath?.UpdateCursorPosition(position);
+    }
+
+    private void beginSlice()
+    {
+        sliceStartPosition = state.Position;
+
+        SliceStarted?.Invoke();
+
+        Add(currentPath = new ChopCursorPath
+        {
+            AccentColour = Color4.GreenYellow,
+            Depth = 1,
+        });
+
+        currentPath.ApplyGameWideClock(host);
+    }
+
+    private void endSlice()
+    {
+        Debug.Assert(currentPath != null);
+
+        currentPath.OnStrokeEnded();
+        currentPath = null;
+
+        SliceEnded?.Invoke();
     }
 
     private readonly record struct CursorState(Vector2 Position, Vector2 Delta, double Time)
