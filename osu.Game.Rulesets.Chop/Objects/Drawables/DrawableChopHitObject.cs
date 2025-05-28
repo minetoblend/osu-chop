@@ -1,7 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using osu.Framework.Bindables;
 using osu.Framework.Graphics;
+using osu.Game.Rulesets.Chop.UI;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osuTK;
@@ -11,15 +13,41 @@ namespace osu.Game.Rulesets.Chop.Objects.Drawables
 {
     public partial class DrawableChopHitObject : DrawableHitObject<ChopHitObject>
     {
-        public DrawableChopHitObject(ChopHitObject hitObject)
-            : base(hitObject)
+        protected readonly Bindable<Vector2> PositionBindable = new Bindable<Vector2>();
+        protected readonly Bindable<float> ThrowOffsetBindable = new Bindable<float>();
+
+        public DrawableChopHitObject(ChopHitObject? hitObject)
+            : base(hitObject!)
         {
-            Size = new Vector2(40);
-            Origin = Anchor.Centre;
+        }
 
-            Position = hitObject.Position;
+        protected override void OnApply()
+        {
+            base.OnApply();
 
-            // todo: add visuals.
+            PositionBindable.BindTo(HitObject.PositionBindable);
+            ThrowOffsetBindable.BindTo(HitObject.ThrowOffsetBindable);
+        }
+
+        protected override void OnFree()
+        {
+            base.OnFree();
+
+            PositionBindable.UnbindFrom(HitObject.PositionBindable);
+            ThrowOffsetBindable.UnbindFrom(HitObject.ThrowOffsetBindable);
+        }
+
+        protected float ThrowProgressAt(double time)
+        {
+            return (float)((time - HitObject.StartTime - HitObject.TimePreempt) / (HitObject.TimePreempt * 2));
+        }
+
+        protected Vector2 ThrowPositionAt(float progress)
+        {
+            float xOffset = ThrowOffsetBindable.Value * (progress - 0.5f) * 2;
+            float yOffset = ChopPlayfield.BASE_SIZE.Y * (progress - 0.5f) * (progress - 0.5f) * 4;
+
+            return HitObject.Position + new Vector2(xOffset, yOffset);
         }
 
         protected override void CheckForResult(bool userTriggered, double timeOffset)
@@ -44,6 +72,20 @@ namespace osu.Game.Rulesets.Chop.Objects.Drawables
                     this.FadeOut(duration, Easing.InQuint).Expire();
                     break;
             }
+        }
+    }
+
+    public partial class DrawableChopHitObject<T> : DrawableChopHitObject
+        where T : ChopHitObject
+    {
+        public DrawableChopHitObject(T hitObject)
+            : base(hitObject)
+        {
+        }
+
+        public DrawableChopHitObject()
+            : base(null)
+        {
         }
     }
 }

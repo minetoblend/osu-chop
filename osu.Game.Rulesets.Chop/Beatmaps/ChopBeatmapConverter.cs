@@ -24,7 +24,7 @@ namespace osu.Game.Rulesets.Chop.Beatmaps
 
         protected override IEnumerable<ChopHitObject> ConvertHitObject(HitObject original, IBeatmap beatmap, CancellationToken cancellationToken)
         {
-            yield return new ChopHitObject
+            yield return new ChopNote
             {
                 Samples = original.Samples,
                 StartTime = original.StartTime,
