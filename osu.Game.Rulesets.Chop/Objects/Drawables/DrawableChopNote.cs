@@ -147,6 +147,8 @@ public partial class DrawableChopNote : DrawableChopHitObject<ChopNote>
             .FadeOut()
             .FadeTo(0.5f, HitObject.TimePreempt)
             .ScaleTo(1, HitObject.TimePreempt, Easing.Out);
+
+        sliceContainer.FadeInFromZero(HitObject.TimePreempt, Easing.Out);
     }
 
     protected override void UpdateHitStateTransforms(ArmedState state)
