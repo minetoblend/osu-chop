@@ -6,7 +6,6 @@ using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Platform;
-using osu.Framework.Utils;
 using osu.Game.Extensions;
 using osu.Game.Rulesets.UI;
 using osuTK;
@@ -65,7 +64,7 @@ public partial class ChopCursorContainer : GameplayCursorContainer
 
     protected override bool OnMouseMove(MouseMoveEvent e)
     {
-        mouseDidMove |= !Precision.AlmostEquals(latestPosition, e.MousePosition);
+        mouseDidMove |= Vector2.DistanceSquared(latestPosition, e.MousePosition) >= 5;
         latestPosition = e.MousePosition;
 
         return base.OnMouseMove(e);
