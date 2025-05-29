@@ -5,6 +5,7 @@ using osu.Framework.Allocation;
 using osu.Game.Rulesets.Chop.Input;
 using osu.Game.Rulesets.Chop.Objects;
 using osu.Game.Rulesets.Chop.Objects.Drawables;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.UI;
@@ -28,15 +29,16 @@ namespace osu.Game.Rulesets.Chop.UI
             inputManager.Playfield = this;
 
             AddRangeInternal([
-                HitObjectContainer
+                HitObjectContainer,
+                hitPolicy = new HitPolicy
+                {
+                    HitObjectContainer = HitObjectContainer,
+                }
             ]);
 
             RegisterPool<ChopNote, DrawableChopNote>(20, 100);
 
-            hitPolicy = new HitPolicy
-            {
-                HitObjectContainer = HitObjectContainer
-            };
+            NewResult += onNewResult;
         }
 
         protected override GameplayCursorContainer CreateCursor() => new ChopCursorContainer();
@@ -49,6 +51,11 @@ namespace osu.Game.Rulesets.Chop.UI
 
             if (drawableHitObject is DrawableChopHitObject chopHitObject)
                 chopHitObject.HitPolicy = hitPolicy;
+        }
+
+        private void onNewResult(DrawableHitObject judgedObject, JudgementResult result)
+        {
+            hitPolicy.HandleHit(judgedObject);
         }
 
         private class ChopLifetimeEntry : HitObjectLifetimeEntry

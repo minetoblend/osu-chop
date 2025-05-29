@@ -1,15 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using osu.Framework.Graphics;
+using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Chop.Input;
+using osu.Game.Rulesets.Chop.Judgements;
 using osu.Game.Rulesets.Chop.Objects.Drawables;
 using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Rulesets.UI;
+using osuTK;
 
 namespace osu.Game.Rulesets.Chop.UI;
 
-public class HitPolicy
+public partial class HitPolicy : CompositeDrawable, ISliceEventHandler
 {
+    public HitPolicy()
+    {
+        RelativeSizeAxes = Axes.Both;
+    }
+
     public IHitObjectContainer? HitObjectContainer { get; set; }
 
     public ClickAction CheckHittable(DrawableHitObject hitObject, double time, HitResult _)
@@ -36,8 +46,15 @@ public class HitPolicy
         return (blockingObject.Judged || time >= blockingObject.HitObject.StartTime) ? ClickAction.Hit : ClickAction.Shake;
     }
 
+    private (double time, Vector2 position, Vector2 direction)? lastHit;
+
     public void HandleHit(DrawableHitObject hitObject)
     {
+        if (hitObject.Result.IsHit && hitObject.Result is ChopJudgementResult chopResult)
+        {
+            lastHit = (chopResult.TimeAbsolute, chopResult.SlicePosition, chopResult.SliceDirection);
+        }
+
         if (HitObjectContainer == null)
             throw new InvalidOperationException($"{nameof(HitObjectContainer)} should be set before {nameof(HandleHit)} is called.");
 
@@ -83,5 +100,15 @@ public class HitPolicy
                 yield return nestedObj;
             }
         }
+    }
+
+    public bool OnSlice(SliceEvent e) => false;
+
+    public bool OnSliceStarted(SliceStartEvent e) => false;
+
+    public bool OnSliceEnded(SliceEndEvent e)
+    {
+        lastHit = null;
+        return false;
     }
 }

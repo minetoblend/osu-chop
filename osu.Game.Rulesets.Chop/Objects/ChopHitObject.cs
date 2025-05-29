@@ -4,6 +4,7 @@
 using osu.Framework.Bindables;
 using osu.Game.Beatmaps;
 using osu.Game.Beatmaps.ControlPoints;
+using osu.Game.Rulesets.Chop.Judgements;
 using osu.Game.Rulesets.Chop.Scoring;
 using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects;
@@ -28,19 +29,19 @@ namespace osu.Game.Rulesets.Chop.Objects
         /// <summary>
         /// Minimum preempt time at AR=10.
         /// </summary>
-        public const double PREEMPT_MIN = 450;
+        public const double PREEMPT_MIN = 600;
 
         /// <summary>
         /// Median preempt time at AR=5.
         /// </summary>
-        public const double PREEMPT_MID = 1200;
+        public const double PREEMPT_MID = 1100;
 
         /// <summary>
         /// Maximum preempt time at AR=0.
         /// </summary>
-        public const double PREEMPT_MAX = 1800;
+        public const double PREEMPT_MAX = 1500;
 
-        public override Judgement CreateJudgement() => new Judgement();
+        public override Judgement CreateJudgement() => new ChopJudgement();
 
         public readonly Bindable<Vector2> PositionBindable = new Bindable<Vector2>();
 

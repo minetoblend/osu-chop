@@ -2,7 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Bindables;
+using osu.Game.Rulesets.Chop.Judgements;
 using osu.Game.Rulesets.Chop.UI;
+using osu.Game.Rulesets.Judgements;
 using osu.Game.Rulesets.Objects.Drawables;
 using osuTK;
 
@@ -50,6 +52,8 @@ namespace osu.Game.Rulesets.Chop.Objects.Drawables
 
             return new Vector2(xOffset, yOffset);
         }
+
+        protected override JudgementResult CreateResult(Judgement judgement) => new ChopJudgementResult(HitObject, judgement);
 
         public void MissForcefully() => ApplyMinResult();
 

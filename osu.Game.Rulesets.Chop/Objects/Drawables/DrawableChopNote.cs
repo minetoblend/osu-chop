@@ -1,6 +1,7 @@
 ﻿using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Game.Rulesets.Chop.Judgements;
 using osu.Game.Rulesets.Chop.Skinning.Default;
 using osu.Game.Rulesets.Chop.UI;
 using osu.Game.Rulesets.Objects;
@@ -50,15 +51,22 @@ public partial class DrawableChopNote : DrawableChopHitObject<ChopNote>
                     sliceContainer = new SliceableContainer
                     {
                         RelativeSizeAxes = Axes.Both,
+                        Size = new Vector2(2),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Children =
-                        [
-                            new SkinnableDrawable(new ChopSkinComponentLookup(ChopSkinComponents.ChopNotePiece))
-                            {
-                                RelativeSizeAxes = Axes.Both,
-                            }
-                        ]
+                        Child = new Container
+                        {
+                            Size = ChopHitObject.OBJECT_DIMENSIONS,
+                            Anchor = Anchor.Centre,
+                            Origin = Anchor.Centre,
+                            Children =
+                            [
+                                new SkinnableDrawable(new ChopSkinComponentLookup(ChopSkinComponents.ChopNotePiece))
+                                {
+                                    RelativeSizeAxes = Axes.Both,
+                                }
+                            ]
+                        }
                     },
                     sliceReceptor = new SliceReceptor
                     {
@@ -116,7 +124,17 @@ public partial class DrawableChopNote : DrawableChopHitObject<ChopNote>
         if (!sliceContainer.Slice(sliceReceptor.LastSliceStartPosition, sliceReceptor.LastSliceEndPosition))
             return;
 
-        ApplyResult(result);
+        var slicePosition = ToLocalSpace(sliceReceptor.LastSliceEndPosition);
+        var sliceDirection = slicePosition - ToLocalSpace(sliceReceptor.LastSliceEndPosition);
+
+        ApplyResult<(HitResult result, Vector2 position, Vector2 direction)>(static (r, state) =>
+        {
+            var chopResult = (ChopJudgementResult)r;
+
+            chopResult.Type = state.result;
+            chopResult.SlicePosition = state.position;
+            chopResult.SliceDirection = state.direction;
+        }, (result, slicePosition, sliceDirection));
     }
 
     protected virtual HitResult ResultFor(double timeOffset) => HitObject.HitWindows.ResultFor(timeOffset);
@@ -128,7 +146,7 @@ public partial class DrawableChopNote : DrawableChopHitObject<ChopNote>
         approachCircle
             .FadeOut()
             .FadeTo(0.5f, HitObject.TimePreempt)
-            .ScaleTo(1, HitObject.TimePreempt);
+            .ScaleTo(1, HitObject.TimePreempt, Easing.Out);
     }
 
     protected override void UpdateHitStateTransforms(ArmedState state)
