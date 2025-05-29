@@ -2,6 +2,7 @@
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input.Events;
+using osu.Framework.Utils;
 using Vector2 = osuTK.Vector2;
 
 namespace osu.Game.Rulesets.Chop.Objects.Drawables;
@@ -17,19 +18,25 @@ public partial class SliceReceptor : CompositeDrawable
 
     protected override bool OnMouseMove(MouseMoveEvent e)
     {
-        var start = e.LastMousePosition;
-        var end = e.MousePosition;
+        if (Precision.AlmostEquals(e.MousePosition, e.LastMousePosition))
+            return false;
 
-        if (intersect(e.LastMousePosition, e.MousePosition, out var position))
+        // let's increase the length a bit so we don't accidentally glitch through the center
+        const float min_length = 10f;
+
+        var lineDirection = (e.MousePosition - e.LastMousePosition).Normalized();
+        float length = Math.Max(Vector2.Distance(e.LastMousePosition, e.MousePosition), min_length);
+
+        var line = new Line(e.MousePosition - lineDirection * length, e.MousePosition);
+
+        var center = DrawSize / 2;
+
+        float radius = center.Y;
+
+        if (new Line(center - line.OrthogonalDirection * radius, center + line.OrthogonalDirection * radius).TryIntersectWith(line, out _))
         {
-            if (new Line(start, end).DistanceToPoint(position) > 1)
-                return false;
-
-            if (!CanHit())
-                return false;
-
-            LastSliceStartPosition = e.ScreenSpaceLastMousePosition;
-            LastSliceEndPosition = e.ScreenSpaceMousePosition;
+            LastSliceStartPosition = ToScreenSpace(line.StartPoint);
+            LastSliceEndPosition = ToScreenSpace(line.EndPoint);
 
             Hit();
         }
