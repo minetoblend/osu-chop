@@ -12,8 +12,8 @@ public class ChopHitWindows : HitWindows
     internal static readonly DifficultyRange[] CHOP_RANGES =
     {
         new DifficultyRange(HitResult.Great, 120, 80, 40),
-        new DifficultyRange(HitResult.Ok, 140, 100, 60),
-        new DifficultyRange(HitResult.Meh, 200, 150, 100),
+        new DifficultyRange(HitResult.Ok, 250, 200, 100),
+        new DifficultyRange(HitResult.Meh, 400, 350, 200),
         new DifficultyRange(HitResult.Miss, MISS_WINDOW, MISS_WINDOW, MISS_WINDOW),
     };
 

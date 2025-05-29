@@ -4,7 +4,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Game.Rulesets.Chop.Judgements;
 using osu.Game.Rulesets.Chop.Skinning.Default;
 using osu.Game.Rulesets.Chop.UI;
-using osu.Game.Rulesets.Objects;
 using osu.Game.Rulesets.Objects.Drawables;
 using osu.Game.Rulesets.Scoring;
 using osu.Game.Skinning;
@@ -83,12 +82,7 @@ public partial class DrawableChopNote : DrawableChopHitObject<ChopNote>
 
     private bool canHit()
     {
-        if (Judged)
-            return false;
-
-        var result = HitObject.HitWindows.ResultFor(Time.Current - HitObject.GetEndTime());
-
-        return result != HitResult.Miss;
+        return !Judged;
     }
 
     protected override void Update()
@@ -115,10 +109,7 @@ public partial class DrawableChopNote : DrawableChopHitObject<ChopNote>
         var result = ResultFor(timeOffset);
         var action = HitPolicy.CheckHittable(this, Time.Current, result);
 
-        if (result == HitResult.Miss || action != ClickAction.Hit)
-            return;
-
-        if (result == HitResult.None)
+        if (result == HitResult.None || action != ClickAction.Hit)
             return;
 
         if (!sliceContainer.Slice(sliceReceptor.LastSliceStartPosition, sliceReceptor.LastSliceEndPosition))
@@ -173,7 +164,6 @@ public partial class DrawableChopNote : DrawableChopHitObject<ChopNote>
                 break;
 
             case ArmedState.Miss:
-                sliceContainer.Reset();
                 this.FadeColour(Color4.Red, 500);
                 this.FadeOut(duration, Easing.InQuint).Expire();
 
