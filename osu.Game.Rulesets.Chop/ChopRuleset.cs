@@ -80,8 +80,6 @@ namespace osu.Game.Rulesets.Chop
 
         public override IBeatmapProcessor? CreateBeatmapProcessor(IBeatmap beatmap) => new BeatmapProcessor(beatmap);
 
-
-
         // Leave this line intact. It will bake the correct version into the ruleset on each build/release.
         public override string RulesetAPIVersionSupported => CURRENT_RULESET_API_VERSION;
     }

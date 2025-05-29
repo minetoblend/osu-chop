@@ -1,6 +1,8 @@
-﻿using osu.Framework.Allocation;
+﻿using System;
+using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
+using osu.Framework.Graphics.Primitives;
 using osu.Game.Rulesets.Chop.Judgements;
 using osu.Game.Rulesets.Chop.Skinning.Default;
 using osu.Game.Rulesets.Chop.UI;
@@ -114,6 +116,14 @@ public partial class DrawableChopNote : DrawableChopHitObject<ChopNote>
 
         if (!sliceContainer.Slice(sliceReceptor.LastSliceStartPosition, sliceReceptor.LastSliceEndPosition))
             return;
+
+        AddInternal(new SliceExplosion
+        {
+            RelativeSizeAxes = Axes.Both,
+            Origin = Anchor.Centre,
+            Position = ToLocalSpace(sliceReceptor.LastSliceEndPosition),
+            Rotation = new Line(ToLocalSpace(sliceReceptor.LastSliceStartPosition), ToLocalSpace(sliceReceptor.LastSliceEndPosition)).Theta * 180f / MathF.PI,
+        });
 
         var slicePosition = ToLocalSpace(sliceReceptor.LastSliceEndPosition);
         var sliceDirection = slicePosition - ToLocalSpace(sliceReceptor.LastSliceEndPosition);

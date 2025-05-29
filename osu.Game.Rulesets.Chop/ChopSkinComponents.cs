@@ -4,4 +4,5 @@ public enum ChopSkinComponents
 {
     ChopNotePiece,
     ApproachCircle,
+    SliceExplosion,
 }
