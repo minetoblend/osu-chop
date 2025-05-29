@@ -1,12 +1,12 @@
 ﻿using System;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
-using osu.Game.Rulesets.Chop.Input;
+using osu.Framework.Input.Events;
 using Vector2 = osuTK.Vector2;
 
 namespace osu.Game.Rulesets.Chop.Objects.Drawables;
 
-public partial class SliceReceptor : CompositeDrawable, ISliceEventHandler
+public partial class SliceReceptor : CompositeDrawable
 {
     public required Func<bool> CanHit { get; init; }
 
@@ -15,7 +15,7 @@ public partial class SliceReceptor : CompositeDrawable, ISliceEventHandler
     public Vector2 LastSliceStartPosition;
     public Vector2 LastSliceEndPosition;
 
-    public bool OnSlice(SliceEvent e)
+    protected override bool OnMouseMove(MouseMoveEvent e)
     {
         var start = e.LastMousePosition;
         var end = e.MousePosition;
@@ -32,7 +32,6 @@ public partial class SliceReceptor : CompositeDrawable, ISliceEventHandler
             LastSliceEndPosition = e.ScreenSpaceMousePosition;
 
             Hit();
-            return true;
         }
 
         return false;
@@ -60,16 +59,6 @@ public partial class SliceReceptor : CompositeDrawable, ISliceEventHandler
         }
 
         position = default;
-        return false;
-    }
-
-    public bool OnSliceStarted(SliceStartEvent e)
-    {
-        return false;
-    }
-
-    public bool OnSliceEnded(SliceEndEvent e)
-    {
         return false;
     }
 

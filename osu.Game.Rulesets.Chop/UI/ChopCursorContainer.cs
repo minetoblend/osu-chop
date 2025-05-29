@@ -4,21 +4,22 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
+using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Framework.Utils;
 using osu.Game.Extensions;
-using osu.Game.Rulesets.Chop.Input;
 using osu.Game.Rulesets.UI;
 using osuTK;
 using osuTK.Graphics;
 
 namespace osu.Game.Rulesets.Chop.UI;
 
-public partial class ChopCursorContainer : GameplayCursorContainer, ISliceEventHandler
+public partial class ChopCursorContainer : GameplayCursorContainer
 {
-    private Vector2 position;
+    private Vector2 latestPosition;
+    private bool mouseDidMove;
 
-    private ChopCursorPath? currentPath;
+    private ChopCursorPath path = null!;
 
     [Resolved]
     private GameHost host { get; set; } = null!;
@@ -27,7 +28,7 @@ public partial class ChopCursorContainer : GameplayCursorContainer, ISliceEventH
 
     protected override Drawable CreateCursor() => new CircularContainer
     {
-        Size = new Vector2(20),
+        Size = new Vector2(10),
         Origin = Anchor.Centre,
         Masking = true,
         BorderColour = Color4.White,
@@ -45,6 +46,16 @@ public partial class ChopCursorContainer : GameplayCursorContainer, ISliceEventH
         }
     };
 
+    [BackgroundDependencyLoader]
+    private void load()
+    {
+        AddInternal(path = new ChopCursorPath
+        {
+            AccentColour = Color4.GreenYellow,
+            Depth = 1,
+        });
+    }
+
     protected override void LoadComplete()
     {
         base.LoadComplete();
@@ -52,45 +63,22 @@ public partial class ChopCursorContainer : GameplayCursorContainer, ISliceEventH
         ActiveCursor.ApplyGameWideClock(host);
     }
 
-    public bool OnSlice(SliceEvent e)
+    protected override bool OnMouseMove(MouseMoveEvent e)
     {
-        if (Precision.AlmostEquals(e.MousePosition, e.LastMousePosition))
-            return false;
+        mouseDidMove |= !Precision.AlmostEquals(latestPosition, e.MousePosition);
+        latestPosition = e.MousePosition;
 
-        currentPath?.AddVertex(e.MousePosition);
-
-        return false;
+        return base.OnMouseMove(e);
     }
 
-    public bool OnSliceStarted(SliceStartEvent e)
+    protected override void Update()
     {
-        ActiveCursor.FadeOut(30);
+        base.Update();
 
-        Add(currentPath = new ChopCursorPath
+        if (mouseDidMove)
         {
-            AccentColour = Color4.GreenYellow,
-            Depth = 1,
-            Vertices = [e.LastMousePosition]
-        });
-
-        currentPath.ApplyGameWideClock(host);
-
-        currentPath.AddVertex(e.MousePosition);
-
-        return false;
-    }
-
-    public bool OnSliceEnded(SliceEndEvent e)
-    {
-        if (currentPath == null)
-            return false;
-
-        ActiveCursor.FadeIn(30);
-
-        currentPath.AddVertex(e.MousePosition);
-        currentPath.OnStrokeEnded();
-        currentPath = null;
-
-        return false;
+            path.AddVertex(latestPosition);
+            mouseDidMove = false;
+        }
     }
 }

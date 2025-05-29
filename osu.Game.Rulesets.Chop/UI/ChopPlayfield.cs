@@ -26,8 +26,6 @@ namespace osu.Game.Rulesets.Chop.UI
         [BackgroundDependencyLoader]
         private void load()
         {
-            inputManager.Playfield = this;
-
             AddRangeInternal([
                 HitObjectContainer,
                 hitPolicy = new HitPolicy

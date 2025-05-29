@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
-using osu.Game.Rulesets.Chop.Input;
 using osu.Game.Rulesets.Chop.Judgements;
 using osu.Game.Rulesets.Chop.Objects.Drawables;
 using osu.Game.Rulesets.Objects;
@@ -13,7 +12,7 @@ using osuTK;
 
 namespace osu.Game.Rulesets.Chop.UI;
 
-public partial class HitPolicy : CompositeDrawable, ISliceEventHandler
+public partial class HitPolicy : CompositeDrawable
 {
     public HitPolicy()
     {
@@ -100,15 +99,5 @@ public partial class HitPolicy : CompositeDrawable, ISliceEventHandler
                 yield return nestedObj;
             }
         }
-    }
-
-    public bool OnSlice(SliceEvent e) => false;
-
-    public bool OnSliceStarted(SliceStartEvent e) => false;
-
-    public bool OnSliceEnded(SliceEndEvent e)
-    {
-        lastHit = null;
-        return false;
     }
 }

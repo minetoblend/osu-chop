@@ -36,22 +36,6 @@ public partial class ChopCursorPath : TexturedStroke
         OriginPosition = PositionInBoundingBox(Vertices[^1]);
     }
 
-    public void UpdateCursorPosition(Vector2 position)
-    {
-        Position = position;
-
-        if (Vertices.Count == 0)
-            return;
-
-        ReplaceVertex(Vertices.Count - 1, position);
-    }
-
-    public void OnStrokeEnded()
-    {
-        active = false;
-        LifetimeEnd = Time.Current + vertex_ttl;
-    }
-
     protected override void Update()
     {
         base.Update();
