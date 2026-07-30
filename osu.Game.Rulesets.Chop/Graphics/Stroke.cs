@@ -286,7 +286,7 @@ public partial class Stroke : Drawable, IBufferedDrawable
 
     public Vector2 PositionInBoundingBox(Vector2 pos) => pos - vertexBounds.TopLeft;
 
-    private readonly BufferedDrawNodeSharedData sharedData = new BufferedDrawNodeSharedData(new[] { RenderBufferFormat.D16 }, clipToRootNode: true);
+    private readonly BufferedDrawNodeSharedData sharedData = new BufferedDrawNodeSharedData(formats: [RenderBufferFormat.D16], clipToRootNode: true);
 
     protected override DrawNode CreateDrawNode() => new PathBufferedDrawNode(this, new StrokeDrawNode(this), sharedData);
 
